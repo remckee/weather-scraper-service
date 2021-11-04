@@ -50,6 +50,36 @@ https.get(url, (res) => {
     try {
       const parsedData = JSON.parse(rawData);
       console.log(parsedData);
+      let temp_unit = "F";
+      let wind_unit = "miles/hour";
+      
+      let data = 
+      {
+          "response": 
+          {
+              description:      parsedData.weather[0].description,
+              temp:             parsedData.main.temp,
+              temp_perceived:   parsedData.main.feels_like,
+              //temp_min:         parsedData.main.temp_min,
+              //temp_max:         parsedData.main.temp_max,
+              temp_units:       temp_unit,
+              pressure:         parsedData.main.pressure,
+              pressure_unit:    "hPa",
+              humidity:         parsedData.main.humidity,
+              humidity_unit:    "%",
+              visibility:       get_miles(parsedData.visibility),
+              visibility_unit:  "mile",
+              wind_speed:       parsedData.wind.speed,
+              wind_gust:        parsedData.wind.gust,
+              wind_unit:        wind_unit,
+              wind_deg:         parsedData.wind.deg,
+              wind_direction_unit: "degrees (meteorological)",
+              cloud_cover:      parsedData.clouds.all,
+              cloud_cover_unit: "%"
+          }
+      };
+      
+    console.log(data);
 
     } catch (e) {
       console.error(e.message);
