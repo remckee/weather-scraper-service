@@ -1,0 +1,16 @@
+{
+  "name": "test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "hwserver.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Rebecca Mckeever",
+  "license": "ISC",
+  "dependencies": {
+    "http": "*",
+    "https": "^1.0.0",
+    "zeromq": "^5.2.8"
+  }
+}
