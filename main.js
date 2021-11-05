@@ -1,4 +1,5 @@
-var https = require('https');
+const https = require('https');
+const querystring = require('querystring');
 
 const MI_TO_M = 1609.344;     // number of meters in a mile
 const MS_TO_S = 1000;         
@@ -103,95 +104,88 @@ function get_direction(degrees) {
     return dir;
 }
 
+exports.get_weather = (url, params, temp_unit) => {
+    str = null;
+    url += querystring.stringify(params);
 
-var url = "https://api.openweathermap.org/data/2.5/weather?";
-let params =
-{
-    "q": "San Antonio,tx,us",
-    "appid": "",
-    "units": "imperial"
-};
+    https.get(url, (res) => {
+        const { statusCode } = res;
+        const contentType = res.headers['content-type'];
+        let error;
 
-Object.keys(params).forEach(function(key){url += "&" + key + "=" + params[key];});
+        if (statusCode !== 200) {
+          error = new Error(`Status Code: ${statusCode}`);
+        }
 
-https.get(url, (res) => {
-    const { statusCode } = res;
-    const contentType = res.headers['content-type'];
-    let error;
+        if (error) {
+          console.error(error.message);
+          res.resume();
+          return;
+        }
 
-    if (statusCode !== 200) {
-      error = new Error(`Status Code: ${statusCode}`);
-    }
+        //res.setEncoding('utf8');
+        let rawData = '';
+        res.on('data', (chunk) => { rawData += chunk; });
+        res.on('end', () => {
+          try {
+              const parsedData = JSON.parse(rawData);
+              console.log(parsedData);
+              let wind_unit = "miles/hour";
+              let sunrise = get_time(parsedData.sys.sunrise, parsedData.timezone);
+              let sunset  = get_time(parsedData.sys.sunset, parsedData.timezone);
 
-    if (error) {
-      console.error(error.message);
-      res.resume();
-      return;
-    }
+              let data = 
+              {
+                  "response": 
+                  {
+                      description:      parsedData.weather[0].description,
+                      temp:             {
+                                            current: parsedData.main.temp,
+                                            perceived: parsedData.main.feels_like,
+                                            unit: temp_unit
+                                        },
+                      pressure:         {
+                                            value: parsedData.main.pressure,
+                                            unit: "hPa"
+                                        },
+                      humidity:         {
+                                            value: parsedData.main.humidity,
+                                            unit: "%"
+                                        },
+                      visibility:       {
+                                            value: get_miles(parsedData.visibility),
+                                            unit: "miles"
+                                        },
+                      wind:             {
+                                            speed: parsedData.wind.speed,
+                                            gust:  parsedData.wind.gust,
+                                            wind_unit
+                                        },
+                      wind_direction:   {
+                                            degrees: parsedData.wind.deg,
+                                            cardinal: get_direction(parsedData.wind.deg)
+                                        },
+                      cloud_cover:      {
+                                            value: parsedData.clouds.all,
+                                            unit: "%"
+                                        },
+                      sunrise:          sunrise,
+                      sunset:           sunset
+                  }
+              };
 
-    //res.setEncoding('utf8');
-    let rawData = '';
-    res.on('data', (chunk) => { rawData += chunk; });
-    res.on('end', () => {
-      try {
-        const parsedData = JSON.parse(rawData);
-        console.log(parsedData);
-        let temp_unit = "F";
-        let wind_unit = "miles/hour";
-        
-        let sunrise = get_time(parsedData.sys.sunrise, parsedData.timezone);
-        let sunset  = get_time(parsedData.sys.sunset, parsedData.timezone);
+              console.log(data);
+              var str = JSON.stringify(data);
+              console.log(str);
 
-        let data = 
-        {
-            "response": 
-            {
-                description:      parsedData.weather[0].description,
-                temp:             {
-                                      value: parsedData.main.temp,
-                                      unit: temp_unit
-                                  },
-                temp_perceived:   {
-                                      value: parsedData.main.feels_like,
-                                      unit: temp_unit
-                                  },
-                pressure:         {
-                                      value: parsedData.main.pressure,
-                                      unit: "hPa"
-                                  },
-                humidity:         {
-                                      value: parsedData.main.humidity,
-                                      unit: "%"
-                                  },
-                visibility:       {
-                                      value: get_miles(parsedData.visibility),
-                                      unit: "miles"
-                                  },
-                wind:             {
-                                      speed: parsedData.wind.speed,
-                                      gust:  parsedData.wind.gust,
-                                      wind_unit
-                                  },
-                wind_direction:   {
-                                      degrees: parsedData.wind.deg,
-                                      cardinal: get_direction(parsedData.wind.deg)
-                                  },
-                cloud_cover:      {
-                                      value: parsedData.clouds.all,
-                                      unit: "%"
-                                  },
-                sunrise:          sunrise,
-                sunset:           sunset
-            }
-        };
-
-      console.log(data);
-
-      } catch (e) {
-        console.error(e.message);
-      }
+          } catch (e) {
+            console.error(e.message);
+          }
+        });
+    }).on('error', (e) => {
+        console.error(`Error: ${e.message}`);
     });
-}).on('error', (e) => {
-    console.error(`Error: ${e.message}`);
-});
+    
+    return str;
+}
 
