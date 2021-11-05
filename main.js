@@ -22,7 +22,7 @@ function get_miles(meters) {
 // Convert a Unix time (seconds since 1 January 1970) to a 
 // an object containing separated components of the date and time
 // for the given value in the given time zone
-function get_time(unix_seconds, time_zone=0) {
+function get_full_date(unix_seconds, time_zone=0) {
     const date1 = new Date((unix_seconds + time_zone) * MS_TO_S);
     
     // extract sign for given time zone
@@ -42,10 +42,68 @@ function get_time(unix_seconds, time_zone=0) {
     };
     
     console.log(time);
-    //padStart(
+    return time;
 }
 
-get_time(1636067033, -18000);
+
+// Convert a Unix time (seconds since 1 January 1970) to a 
+// an object containing separated components of the date and time
+// for the given value in the given time zone
+function get_time(unix_seconds, time_zone=0) {
+    const date1 = new Date((unix_seconds + time_zone) * MS_TO_S);
+    
+    // extract sign for given time zone
+    var time_zone_str = "UTC";
+    time_zone_str += (time_zone >= 0) ? "+" : "-";
+    time_zone = Math.abs(time_zone);
+    
+    let time =
+    [
+        date1.getUTCHours().toString().padStart(2, '0'),
+        date1.getUTCDate().toString().padStart(2, '0'),
+        date1.getUTCSeconds().toString().padStart(2, '0')
+    ];
+    
+    var time_str = time.join(':');
+    time_str += ' ' + time_zone_str + (time_zone/3600.0).toString().padStart(2, '0');
+    
+    return time_str;
+}
+
+
+let DIV_DEG = 360.0/16.0;           // number of degrees per direction division
+let NESW = ["N", "E", "S", "W"];
+
+
+// convert a meteorological degree to a cardinal direction:
+// N, E, S, W
+// NE, SE, SW, NW
+// NNE, ENE, ESE, SSE, SSW, WSW, WNW, NNW
+function get_direction(degrees) {
+    var quadrant = Math.trunc(degrees/90);
+    var rem = degrees%90;
+    var dir = "";
+    var half_dev = DIV_DEG/2;
+    if (rem < half_dev) {
+        dir = NESW[quadrant%4];
+    } else if (rem < DIV_DEG + half_dev) {
+        dir += NESW[quadrant%4];
+        dir += (quadrant==0 || quadrant==3) ? "N" : "S";
+        dir += (quadrant==0 || quadrant==1) ? "E" : "W";
+    } else if (rem < 2*DIV_DEG + half_dev) {
+        dir += (quadrant==0 || quadrant==3) ? "N" : "S";
+        dir += (quadrant==0 || quadrant==1) ? "E" : "W";
+    } else if (rem < 3*DIV_DEG + half_dev) {
+        dir += NESW[(quadrant+1)%4];
+        dir += (quadrant==0 || quadrant==3) ? "N" : "S";
+        dir += (quadrant==0 || quadrant==1) ? "E" : "W";
+    } else if (rem < 90) {
+        dir = NESW[(quadrant+1)%4];
+    }
+    return dir;
+}
+
+
 var url = "https://api.openweathermap.org/data/2.5/weather?";
 let params =
 {
@@ -71,7 +129,7 @@ https.get(url, (res) => {
       return;
     }
 
-    res.setEncoding('utf8');
+    //res.setEncoding('utf8');
     let rawData = '';
     res.on('data', (chunk) => { rawData += chunk; });
     res.on('end', () => {
@@ -81,6 +139,9 @@ https.get(url, (res) => {
         let temp_unit = "F";
         let wind_unit = "miles/hour";
         
+        let sunrise = get_time(parsedData.sys.sunrise, parsedData.timezone);
+        let sunset  = get_time(parsedData.sys.sunset, parsedData.timezone);
+
         let data = 
         {
             "response": 
@@ -88,8 +149,8 @@ https.get(url, (res) => {
                 description:      parsedData.weather[0].description,
                 temp:             parsedData.main.temp,
                 temp_perceived:   parsedData.main.feels_like,
-                temp_min:         parsedData.main.temp_min,
-                temp_max:         parsedData.main.temp_max,
+                //temp_min:         parsedData.main.temp_min,
+                //temp_max:         parsedData.main.temp_max,
                 temp_units:       temp_unit,
                 pressure:         parsedData.main.pressure,
                 pressure_unit:    "hPa",
@@ -100,20 +161,18 @@ https.get(url, (res) => {
                 wind_speed:       parsedData.wind.speed,
                 wind_gust:        parsedData.wind.gust,
                 wind_unit:        wind_unit,
-                wind_deg:         parsedData.wind.deg,
-                wind_direction_unit: "degrees (meteorological)",
+                wind_degrees:     parsedData.wind.deg,
+                wind_direction:   get_direction(parsedData.wind.deg),
                 cloud_cover:      parsedData.clouds.all,
-                cloud_cover_unit: "%"
+                cloud_cover_unit: "%",
+                sunrise:          sunrise,
+                sunset:           sunset
             }
             
             
         };
-        
-        
-        
+
       console.log(data);
-      
-      get_time(parsedData.dt);
 
       } catch (e) {
         console.error(e.message);
