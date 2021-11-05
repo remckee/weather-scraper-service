@@ -147,29 +147,42 @@ https.get(url, (res) => {
             "response": 
             {
                 description:      parsedData.weather[0].description,
-                temp:             parsedData.main.temp,
-                temp_perceived:   parsedData.main.feels_like,
-                //temp_min:         parsedData.main.temp_min,
-                //temp_max:         parsedData.main.temp_max,
-                temp_units:       temp_unit,
-                pressure:         parsedData.main.pressure,
-                pressure_unit:    "hPa",
-                humidity:         parsedData.main.humidity,
-                humidity_unit:    "%",
-                visibility:       get_miles(parsedData.visibility),
-                visibility_unit:  "miles",
-                wind_speed:       parsedData.wind.speed,
-                wind_gust:        parsedData.wind.gust,
-                wind_unit:        wind_unit,
-                wind_degrees:     parsedData.wind.deg,
-                wind_direction:   get_direction(parsedData.wind.deg),
-                cloud_cover:      parsedData.clouds.all,
-                cloud_cover_unit: "%",
+                temp:             {
+                                      value: parsedData.main.temp,
+                                      unit: temp_unit
+                                  },
+                temp_perceived:   {
+                                      value: parsedData.main.feels_like,
+                                      unit: temp_unit
+                                  },
+                pressure:         {
+                                      value: parsedData.main.pressure,
+                                      unit: "hPa"
+                                  },
+                humidity:         {
+                                      value: parsedData.main.humidity,
+                                      unit: "%"
+                                  },
+                visibility:       {
+                                      value: get_miles(parsedData.visibility),
+                                      unit: "miles"
+                                  },
+                wind:             {
+                                      speed: parsedData.wind.speed,
+                                      gust:  parsedData.wind.gust,
+                                      wind_unit
+                                  },
+                wind_direction:   {
+                                      degrees: parsedData.wind.deg,
+                                      cardinal: get_direction(parsedData.wind.deg)
+                                  },
+                cloud_cover:      {
+                                      value: parsedData.clouds.all,
+                                      unit: "%"
+                                  },
                 sunrise:          sunrise,
                 sunset:           sunset
             }
-            
-            
         };
 
       console.log(data);
