@@ -21,8 +21,21 @@ requester.on("message", function(reply) {
 requester.connect("tcp://localhost:5555");
 
 for (var i = 0; i < 1; i++) {
-  console.log("Sending request", i, '...');
-  requester.send("A message from CS361");
+    console.log("Sending request", i, '...');
+    var req = 
+    {
+        "request": 
+        {
+            "city": "Portland",
+            "state": "Oregon",
+            "country": "us",
+            "temp_unit": "F"
+        }
+    };
+    
+    var msg = JSON.stringify(req);
+    
+    requester.send(msg);
 }
 
 process.on('SIGINT', function() {

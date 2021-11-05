@@ -104,7 +104,7 @@ function get_direction(degrees) {
     return dir;
 }
 
-exports.get_weather = (url, params, temp_unit) => {
+exports.get_weather = (url, params, temp_unit, responder) => {
     str = null;
     url += querystring.stringify(params);
 
@@ -176,7 +176,7 @@ exports.get_weather = (url, params, temp_unit) => {
 
               console.log(data);
               var str = JSON.stringify(data);
-              console.log(str);
+              responder.send(str);
 
           } catch (e) {
             console.error(e.message);
@@ -185,7 +185,5 @@ exports.get_weather = (url, params, temp_unit) => {
     }).on('error', (e) => {
         console.error(`Error: ${e.message}`);
     });
-    
-    return str;
 }
 
