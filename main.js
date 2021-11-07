@@ -9,13 +9,22 @@ const MS_TO_S = 1000;
 function get_miles(meters) {
     var meters_string = meters.toString();
     var sig_figs = 0;
-    
+
     // For each character of the string version of meters, increment
-    // sig figs if the character is a numeric value.
+    // sig figs if the character is a sig fig,
+    // e.g., a numeric character that is not a trailing or leading 0
     const regex = new RegExp('[0-9]');
+    sf = false;
     for (const ch of meters_string) {
-        sig_figs += (regex.test(ch)) ? 1 : 0;
+        if (!sf && ch != '0' && regex.test(ch)) {
+            sf = true;
+        }
+        
+        if (sf) {
+          sig_figs += (regex.test(ch)) ? 1 : 0;
+        }
     }
+
     return Number.parseFloat((meters/MI_TO_M).toPrecision(sig_figs));
 }
 
@@ -159,7 +168,7 @@ exports.get_weather = (url, params, temp_unit, responder) => {
                       wind:             {
                                             speed: parsedData.wind.speed,
                                             gust:  parsedData.wind.gust,
-                                            wind_unit
+                                            unit: wind_unit
                                         },
                       wind_direction:   {
                                             degrees: parsedData.wind.deg,
