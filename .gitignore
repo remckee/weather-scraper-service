@@ -2,6 +2,7 @@
 *
 
 #unignore things we want to track
+!*LICENSE
 !*.gitignore
 !*.md
 !*.html
