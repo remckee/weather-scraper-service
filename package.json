@@ -1,5 +1,6 @@
 {
-  "name": "test",
+  "name": "weather_app",
+  "type": "module",
   "version": "0.1.0",
   "description": "",
   "main": "server.js",
@@ -12,7 +13,6 @@
     "forever": "^4.0.1",
     "http": "*",
     "https": "^1.0.0",
-    "querystring": "^0.2.1",
-    "zeromq": "^5.2.8"
+    "ws": "^8.2.3"
   }
 }

@@ -1,5 +1,4 @@
-const https = require('https');
-const querystring = require('querystring');
+import https from 'https';
 
 const MI_TO_M = 1609.344;     // number of meters in a mile
 const MS_TO_S = 1000;         
@@ -14,7 +13,7 @@ function get_miles(meters) {
     // sig figs if the character is a sig fig,
     // e.g., a numeric character that is not a trailing or leading 0
     const regex = new RegExp('[0-9]');
-    sf = false;
+    var sf = false;
     for (const ch of meters_string) {
         if (!sf && ch != '0' && regex.test(ch)) {
             sf = true;
@@ -51,7 +50,6 @@ function get_full_date(unix_seconds, time_zone=0) {
         "time_zone": time_zone_str + (time_zone/3600.0).toString().padStart(2, '0')
     };
     
-    console.log(time);
     return time;
 }
 
@@ -113,9 +111,9 @@ function get_direction(degrees) {
     return dir;
 }
 
-exports.get_weather = (url, params, temp_unit, responder) => {
-    str = null;
-    url += querystring.stringify(params);
+function weather(url, params, temp_unit, ws) {
+    var url_params = new URLSearchParams(params);
+    url += url_params.toString();
 
     https.get(url, (res) => {
         const { statusCode } = res;
@@ -132,60 +130,57 @@ exports.get_weather = (url, params, temp_unit, responder) => {
           return;
         }
 
-        //res.setEncoding('utf8');
+        res.setEncoding('utf8');
         let rawData = '';
         res.on('data', (chunk) => { rawData += chunk; });
         res.on('end', () => {
           try {
               const parsedData = JSON.parse(rawData);
               console.log(parsedData);
-              let wind_unit = "miles/hour";
+              let wind_unit = (params.units=="imperial") ? "miles/hour" : "meter/sec";
               let sunrise = get_time(parsedData.sys.sunrise, parsedData.timezone);
               let sunset  = get_time(parsedData.sys.sunset, parsedData.timezone);
 
               let data = 
               {
-                  "response": 
-                  {
-                      description:      parsedData.weather[0].description,
-                      temp:             {
-                                            current: parsedData.main.temp,
-                                            perceived: parsedData.main.feels_like,
-                                            unit: temp_unit
-                                        },
-                      pressure:         {
-                                            value: parsedData.main.pressure,
-                                            unit: "hPa"
-                                        },
-                      humidity:         {
-                                            value: parsedData.main.humidity,
-                                            unit: "%"
-                                        },
-                      visibility:       {
-                                            value: get_miles(parsedData.visibility),
-                                            unit: "miles"
-                                        },
-                      wind:             {
-                                            speed: parsedData.wind.speed,
-                                            gust:  parsedData.wind.gust,
-                                            unit: wind_unit
-                                        },
-                      wind_direction:   {
-                                            degrees: parsedData.wind.deg,
-                                            cardinal: get_direction(parsedData.wind.deg)
-                                        },
-                      cloud_cover:      {
-                                            value: parsedData.clouds.all,
-                                            unit: "%"
-                                        },
-                      sunrise:          sunrise,
-                      sunset:           sunset
-                  }
+                  description:      parsedData.weather[0].description,
+                  temp:             {
+                                        current: parsedData.main.temp,
+                                        perceived: parsedData.main.feels_like,
+                                        unit: temp_unit
+                                    },
+                  pressure:         {
+                                        value: parsedData.main.pressure,
+                                        unit: "hPa"
+                                    },
+                  humidity:         {
+                                        value: parsedData.main.humidity,
+                                        unit: "%"
+                                    },
+                  visibility:       {
+                                        value: parsedData.visibility,
+                                        unit: "meter"
+                                    },
+                  wind:             {
+                                        speed: parsedData.wind.speed,
+                                        gust:  parsedData.wind.gust,
+                                        unit: wind_unit
+                                    },
+                  wind_direction:   {
+                                        degrees: parsedData.wind.deg,
+                                        cardinal: get_direction(parsedData.wind.deg)
+                                    },
+                  cloud_cover:      {
+                                        value: parsedData.clouds.all,
+                                        unit: "%"
+                                    },
+                  sunrise:          sunrise,
+                  sunset:           sunset
               };
 
               console.log(data);
               var str = JSON.stringify(data);
-              responder.send(str);
+              ws.send(str);
 
           } catch (e) {
             console.error(e.message);
@@ -196,3 +191,4 @@ exports.get_weather = (url, params, temp_unit, responder) => {
     });
 }
 
+export default weather;
