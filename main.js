@@ -139,45 +139,45 @@ function weather(url, params, temp_unit, ws) {
               
               // uncomment next line to see original data from the weather API
               //console.log(parsedData);
-              let wind_unit = (params.units=="imperial") ? "miles/hour" : "meter/sec";
+              let wind_unit = (params.units=="imperial") ? "mph" : "m/s";
               let sunrise = get_time(parsedData.sys.sunrise, parsedData.timezone);
               let sunset  = get_time(parsedData.sys.sunset, parsedData.timezone);
 
               let data = 
               {
-                  description:      parsedData.weather[0].description,
-                  temp:             {
-                                        current: parsedData.main.temp,
-                                        perceived: parsedData.main.feels_like,
-                                        unit: temp_unit
+                  "description":    parsedData.weather[0].description,
+                  "temp":           {
+                                        "current": parsedData.main.temp,
+                                        "perceived": parsedData.main.feels_like,
+                                        "unit": temp_unit
                                     },
-                  pressure:         {
-                                        value: parsedData.main.pressure,
-                                        unit: "hPa"
+                  "pressure":       {
+                                        "value": parsedData.main.pressure,
+                                        "unit": "hPa"
                                     },
-                  humidity:         {
-                                        value: parsedData.main.humidity,
-                                        unit: "%"
+                  "humidity":       {
+                                        "value": parsedData.main.humidity,
+                                        "unit": "%"
                                     },
-                  visibility:       {
-                                        value: parsedData.visibility,
-                                        unit: "meter"
+                  "visibility":     {
+                                        "value": parsedData.visibility,
+                                        "unit": "m"
                                     },
-                  wind:             {
-                                        speed: parsedData.wind.speed,
-                                        gust:  parsedData.wind.gust,
-                                        unit: wind_unit
+                  "wind":           {
+                                        "speed": parsedData.wind.speed,
+                                        "gust":  parsedData.wind.gust,
+                                        "unit": wind_unit
                                     },
-                  wind_direction:   {
-                                        degrees: parsedData.wind.deg,
-                                        cardinal: get_direction(parsedData.wind.deg)
+                  "wind_direction": {
+                                        "degrees": parsedData.wind.deg,
+                                        "cardinal": get_direction(parsedData.wind.deg)
                                     },
-                  cloud_cover:      {
-                                        value: parsedData.clouds.all,
-                                        unit: "%"
+                  "cloud_cover":    {
+                                        "value": parsedData.clouds.all,
+                                        "unit": "%"
                                     },
-                  sunrise:          sunrise,
-                  sunset:           sunset
+                  "sunrise":        sunrise,
+                  "sunset":         sunset
               };
 
               console.log(data);

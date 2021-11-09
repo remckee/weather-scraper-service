@@ -1,10 +1,30 @@
 import WebSocket from 'ws';
 const port = 5524;
-const host = "flip1.engr.oregonstate.edu";
+const host = "localhost";   // change to "flip1.engr.oregonstate.edu" 
+                            // to run on flip servers
 
-// process command line arguments into an object
-// if the command line args are:
-// portland or us F
+// You will likely need to replace the portion 
+// of the code between START and END.
+// The request will be sent using the req variable, so you need to
+// fill req with the correctly formatted parameters of your
+// request. For example, the following would be equivalent
+// to using the example command line args shown after START:
+// var req = {
+//        "city": "Portland",
+//        "state": "or",
+//        "country": "us",
+//        "unit": "C"
+// };
+
+//**** START
+
+// Process command line arguments into an object.
+// example of command line args:
+// city=Portland state=or country=us unit=C
+
+// For names with spaces, include double quotes around the name:
+// city="San Francisco" state=ca country=us
+
 var req = {};
 
 process.argv.forEach((val, index) => {
@@ -13,6 +33,8 @@ process.argv.forEach((val, index) => {
         req[`${args[0]}`] = args[1];
     }
 });
+
+//**** END
 
 // connect to server
 const ws = new WebSocket(`ws://${host}:${port}`);
