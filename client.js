@@ -1,7 +1,10 @@
 import WebSocket from 'ws';
 const port = 5524;
+const host = "flip1.engr.oregonstate.edu";
 
-// get command line arguments
+// process command line arguments into an object
+// if the command line args are:
+// portland or us F
 var req = {};
 
 process.argv.forEach((val, index) => {
@@ -11,15 +14,17 @@ process.argv.forEach((val, index) => {
     }
 });
 
-
-const ws = new WebSocket(`ws://localhost:${port}`);
+// connect to server
+const ws = new WebSocket(`ws://${host}:${port}`);
 console.log("Connecting to server...");
 
+// send request
 ws.on('open', function open() {
     console.log('Sending request: \n%s', req);
     ws.send( JSON.stringify(req) );
 });
 
+// read reply
 ws.on('message', function message(data) {
     console.log('Received reply: \n%s', data);
 });

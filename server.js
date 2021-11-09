@@ -7,6 +7,7 @@ import { WebSocketServer } from 'ws';
 const url = 'https://api.openweathermap.org/data/2.5/weather?';
 const port = 5524;
 const wss = new WebSocketServer({ port: port });
+console.log(`Listening on ${port}...`);
 
 wss.on('connection', function connection(ws) {
     console.log(`Client connected on port ${port}`);
@@ -36,6 +37,8 @@ wss.on('connection', function connection(ws) {
             params.q = loc.join(',');
         }
         
+        // To obtain the value for appid, create an account at
+        // https://home.openweathermap.org/users/sign_up
         params.appid = "";
         params.units = units;
 

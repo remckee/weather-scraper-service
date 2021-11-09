@@ -136,7 +136,9 @@ function weather(url, params, temp_unit, ws) {
         res.on('end', () => {
           try {
               const parsedData = JSON.parse(rawData);
-              console.log(parsedData);
+              
+              // uncomment next line to see original data from the weather API
+              //console.log(parsedData);
               let wind_unit = (params.units=="imperial") ? "miles/hour" : "meter/sec";
               let sunrise = get_time(parsedData.sys.sunrise, parsedData.timezone);
               let sunset  = get_time(parsedData.sys.sunset, parsedData.timezone);
