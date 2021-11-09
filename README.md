@@ -55,6 +55,8 @@ For zip code, the country code must be included for non-US locations. US is the 
 
 Responses
 =======
+
+The temperature unit can be either `C` or `F`. If the temperature unit is `F`, wind unit will be in mph, but the other units are the same in both. 
     
     {
         description: 'mist',
