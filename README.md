@@ -5,7 +5,7 @@ Obtains weather data for a location from OpenWeatherMap API.
 
 
 Installing and running the server
-=======
+-----------
 
 To install, navigate to the folder where you saved the files, and run
 
@@ -16,7 +16,7 @@ to install the required modules. To start the server, run
     node server.js
 
 Using the provided client
-=======
+-----------
 
 The provided client can be used to test out the program on the command line and as an example client program. You will likely need to modify it for use in your application or use an entirely different client program.
 
@@ -29,7 +29,7 @@ To get the weather for San Francisco, California and specify `C` (Celsius) as th
 Note that double quotes are required around city names that include spaces.
 
 Requests
-=======
+-----------
 
 Requests can be formatted using either a city name or a zip code. For either format, you can optionally include a parameter for the desired temperature unit. If it is not included, `F` (Fahrenheit) is the default.
 
@@ -54,7 +54,7 @@ For zip code, the country code must be included for non-US locations. US is the 
     }
 
 Responses
-=======
+-----------
 
 The temperature unit can be either `C` or `F`. If the temperature unit is `F`, wind unit will be in mph, but the other units are the same in both. 
     
